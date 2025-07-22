@@ -1,4 +1,4 @@
-package uz.binartpro.pizzatgbot.model;
+package uz.binartpro.pizzatgbot.constants;
 
 public enum OrderState {
     PIZZA_SELECTION,
