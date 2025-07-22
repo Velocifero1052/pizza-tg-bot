@@ -6,6 +6,9 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import uz.binartpro.pizzatgbot.strategy.CallbackStrategy;
+import uz.binartpro.pizzatgbot.strategy.Strategy;
+import uz.binartpro.pizzatgbot.strategy.TextStrategy;
 
 @Component
 @RequiredArgsConstructor
@@ -23,20 +26,30 @@ public class Responder extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        if (update.hasMessage() && update.getMessage().hasText()) {
-            String messageText = update.getMessage().getText();
-            long chatId = update.getMessage().getChatId();
-
-            SendMessage message = new SendMessage();
-            message.setChatId(String.valueOf(chatId));
-            message.setText("You said: " + messageText);
-
-            try {
-                execute(message);
-            } catch (TelegramApiException e) {
-                e.printStackTrace();
+        Strategy strategy;
+        try {
+            SendMessage response = null;
+            if (update.hasCallbackQuery()) {
+                response = new CallbackStrategy().getResponse(update);
             }
+
+            if (update.hasMessage()) {
+                response = new TextStrategy().getResponse(update);
+            }
+
+            if (response == null) {
+                System.out.println("ERROR: update type couldn't be determined");
+                return;
+            }
+
+            sendApiMethod(response);
+
+
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
         }
+
+
     }
 
 }
