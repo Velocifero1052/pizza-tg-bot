@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: pizza-bot-example
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/pizza-bot
